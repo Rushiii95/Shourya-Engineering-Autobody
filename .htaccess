@@ -1,0 +1,33 @@
+# Apache / cPanel / most Indian shared hosting
+Options -Indexes -MultiViews
+ServerSignature Off
+
+# Force HTTPS
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [L,R=301]
+
+<IfModule mod_headers.c>
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; frame-src https://www.google.com https://maps.google.com; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests"
+  Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+  Header always set Cross-Origin-Resource-Policy "same-origin"
+  Header unset X-Powered-By
+</IfModule>
+
+# Only allow safe request methods on a static site
+<LimitExcept GET HEAD OPTIONS>
+  Require all denied
+</LimitExcept>
+
+# Block hidden files, backups and config-style files (allow .well-known)
+<FilesMatch "^\.(?!well-known)|\.(bak|old|orig|sql|log|ini|env|git|sh|php|phtml|cgi|pl|py)$">
+  Require all denied
+</FilesMatch>
+<Files "README.md">
+  Require all denied
+</Files>
